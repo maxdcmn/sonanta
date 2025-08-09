@@ -24,8 +24,23 @@ function ListItem({
   title,
   children,
   href,
+  disabled = false,
   ...props
-}: React.ComponentPropsWithoutRef<'li'> & { href: string }) {
+}: React.ComponentPropsWithoutRef<'li'> & { href: string; disabled?: boolean }) {
+  if (disabled) {
+    return (
+      <li {...props}>
+        <div aria-disabled="true" className="cursor-not-allowed rounded-md p-2 opacity-50">
+          <div className="flex items-center gap-2">
+            <div className="text-sm leading-none font-medium">{title}</div>
+            <span className="text-muted-foreground text-[10px] tracking-wide uppercase">Soon</span>
+          </div>
+          <p className="text-muted-foreground line-clamp-2 text-sm">{children}</p>
+        </div>
+      </li>
+    );
+  }
+
   return (
     <li {...props}>
       <NavigationMenuLink asChild>
@@ -75,6 +90,21 @@ function useNavbarVisibility({
 
 export function Header() {
   const { isVisible, hovering, onMouseEnter, onMouseLeave } = useNavbarVisibility({});
+  const [homeMenuOpen, setHomeMenuOpen] = useState(false);
+  const [dashboardMenuOpen, setDashboardMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setHomeMenuOpen(false);
+      setDashboardMenuOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, []);
 
   const headerClass = clsx(
     'fixed top-0 z-50 w-full p-6 transition-transform duration-300 ease-in-out',
@@ -113,11 +143,11 @@ export function Header() {
                             </a>
                           </NavigationMenuLink>
                         </li>
-                        <ListItem href="/how-it-works" title="How it works">
-                          A quick guide to using the app.
-                        </ListItem>
                         <ListItem href="/contact" title="Contact us">
                           Have questions? We&apos;d love to hear from you.
+                        </ListItem>
+                        <ListItem href="/how-it-works" title="How it works" disabled>
+                          A quick guide to using the app.
                         </ListItem>
                       </ul>
                     </NavigationMenuContent>
@@ -144,34 +174,39 @@ export function Header() {
               </NavigationMenu>
 
               <div className="flex space-x-2 md:hidden">
-                <DropdownMenu>
+                <DropdownMenu open={homeMenuOpen} onOpenChange={setHomeMenuOpen}>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="flex items-center gap-1">
                       Home
                       <ChevronDown className="h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuContent align="start" className="w-40">
                     <DropdownMenuItem asChild>
                       <Link href="/">Sonanta</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/how-it-works">How it works</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
                       <Link href="/contact">Contact us</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem disabled>
+                      <span className="flex w-full cursor-not-allowed items-center justify-between opacity-60">
+                        <span>How it works</span>
+                        <span className="text-muted-foreground text-[10px] tracking-wide uppercase">
+                          Soon
+                        </span>
+                      </span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                <DropdownMenu>
+                <DropdownMenu open={dashboardMenuOpen} onOpenChange={setDashboardMenuOpen}>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="flex items-center gap-1">
                       Dashboard
                       <ChevronDown className="h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuContent align="start" className="w-40">
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard">Overview</Link>
                     </DropdownMenuItem>

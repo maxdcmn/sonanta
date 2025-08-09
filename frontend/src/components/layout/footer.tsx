@@ -2,44 +2,33 @@
 
 import Link from 'next/link';
 import { FadeUp } from '@/components/motion/fade-up';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 
 export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-foreground text-background relative overflow-hidden">
-      <div className="mx-auto max-w-6xl px-6 py-12">
+    <footer className="bg-background text-foreground relative overflow-hidden">
+      <div className="mx-auto max-w-6xl px-10 py-12">
         <div className="grid grid-cols-4 gap-10">
           <FadeUp className="col-span-2" delay={0.1} useInView>
             <div className="flex flex-col items-start gap-2">
-              <span className="text-background font-mono text-lg font-medium tracking-tight">
+              <span className="text-foreground font-mono text-lg font-medium tracking-tight">
                 sonanta
               </span>
               <p className="text-muted-foreground text-sm">A product by students enjoying AI.</p>
-
-              <div className="mt-2">
-                <Button asChild variant="secondary" className="dark">
-                  <Link href="/signup">
-                    Get started
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
             </div>
           </FadeUp>
 
           <FadeUp delay={0.2} useInView>
-            <h3 className="text-background mb-3 font-medium">Product</h3>
+            <h3 className="text-foreground mb-3 font-medium">Product</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link className="text-muted-foreground hover:text-background" href="/login">
+                <Link className="text-muted-foreground hover:text-foreground" href="/login">
                   Login
                 </Link>
               </li>
               <li>
-                <Link className="text-muted-foreground hover:text-background" href="/signup">
+                <Link className="text-muted-foreground hover:text-foreground" href="/signup">
                   Sign Up
                 </Link>
               </li>
@@ -47,15 +36,15 @@ export function Footer() {
           </FadeUp>
 
           <FadeUp delay={0.3} useInView>
-            <h3 className="text-background mb-3 font-medium">Company</h3>
+            <h3 className="text-foreground mb-3 font-medium">Company</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link className="text-muted-foreground hover:text-background" href="/">
-                  About
+                <Link className="text-muted-foreground hover:text-foreground" href="/">
+                  Landing
                 </Link>
               </li>
               <li>
-                <Link className="text-muted-foreground hover:text-background" href="/">
+                <Link className="text-muted-foreground hover:text-foreground" href="/contact">
                   Contact
                 </Link>
               </li>
