@@ -1,0 +1,10 @@
+.next
+.cache
+.vercel
+.husky
+out
+public
+node_modules
+next-env.d.ts
+pnpm-lock.yaml
+migrations
