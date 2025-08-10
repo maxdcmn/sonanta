@@ -49,7 +49,7 @@ export function LoginForm({
         return;
       }
       toast.success('Welcome back!');
-      router.replace('/dashboard');
+      router.replace('/voice/notes');
       router.refresh();
     } catch {
       toast.error('Something went wrong. Please try again.');

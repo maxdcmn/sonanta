@@ -3,7 +3,6 @@ import { useState, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import VoiceReactiveCircles from '@/components/motion/voice-circles';
 
-// Minimal VoiceMemo type aligned with DB schema and app usage
 export type VoiceMemo = {
   id: string;
   user_id: string;

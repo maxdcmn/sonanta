@@ -83,11 +83,7 @@ export default function VoiceNotesPage() {
 
           <FadeUp delay={0.2}>
             <div className="space-y-4">
-              {loading ? (
-                <div className="py-8 text-center">
-                  <p className="text-muted-foreground text-sm">Loading voice notes...</p>
-                </div>
-              ) : voiceMemos.length === 0 ? (
+              {loading ? null : voiceMemos.length === 0 ? (
                 <div className="py-8 text-center">
                   <p className="text-muted-foreground text-sm">Your voice notes will appear here</p>
                 </div>
