@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from 'next-themes';
+import { AuthProvider } from '@/lib/auth-provider';
+import { createClient } from '@/lib/supabase/server';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -15,21 +17,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Sontana',
-  description: 'Sontana',
+  title: 'Sonanta',
+  description: 'Sonanta',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider attribute="class" forcedTheme="dark">
-          {children}
-          <Toaster position="top-center" />
+          <AuthProvider initialUser={user}>
+            {children}
+            <Toaster position="top-center" />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

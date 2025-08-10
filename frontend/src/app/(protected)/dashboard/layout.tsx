@@ -3,8 +3,9 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { UserIcon, ChartBarIcon, CreditCardIcon } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/lib/auth-provider';
+import { UserIcon, ChartBarIcon, CreditCardIcon } from 'lucide-react';
 
 const navigationItems = [
   {
@@ -29,13 +30,19 @@ const navigationItems = [
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { userInfo } = useAuth();
+
+  const displayName =
+    userInfo && userInfo.firstName && userInfo.lastName
+      ? `${userInfo.firstName} ${userInfo.lastName}`
+      : userInfo?.email || '';
 
   return (
-    <div className="mx-auto max-w-7xl pt-40 pb-20">
+    <div className="mx-auto max-w-6xl px-10 pt-40 pb-20">
       <div className="lg:hidden">
         <div className="mb-6">
-          <div className="flex items-center gap-2 text-sm font-medium">Name</div>
-          <div className="text-muted-foreground text-sm">Pro - name@sonanta.com</div>
+          <div className="flex items-center gap-2 text-sm font-medium">{displayName}</div>
+          <div className="text-muted-foreground text-sm">{userInfo?.email}</div>
         </div>
         <nav className="mb-8">
           <Tabs value={pathname} className="w-full">
@@ -54,8 +61,8 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
       <div className="hidden lg:grid lg:grid-cols-4 lg:gap-12">
         <div className="col-span-1">
           <div className="mb-6">
-            <div className="flex items-center gap-2 text-sm font-medium">Name</div>
-            <div className="text-muted-foreground text-sm">Pro - name@sonanta.com</div>
+            <div className="flex items-center gap-2 text-sm font-medium">{displayName}</div>
+            <div className="text-muted-foreground text-sm">{userInfo?.email}</div>
           </div>
           <nav className="space-y-1">
             {navigationItems.map((item) => (

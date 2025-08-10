@@ -34,9 +34,14 @@ export function SubscriptionForm() {
   };
 
   return (
-    <Card>
+    <Card className="relative opacity-60">
       <CardHeader>
-        <CardTitle>Subscription</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          Subscription
+          <Badge variant="secondary" className="text-xs">
+            Soon
+          </Badge>
+        </CardTitle>
         <CardDescription>Select the plan that best fits your needs.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -44,10 +49,9 @@ export function SubscriptionForm() {
           {plans.map((plan) => (
             <Card
               key={plan.id}
-              className={`relative cursor-pointer transition-all ${
-                selectedPlan === plan.id ? 'bg-primary/10' : 'bg-primary/3 hover:bg-primary/5'
+              className={`relative cursor-not-allowed opacity-50 transition-all ${
+                selectedPlan === plan.id ? 'bg-primary/10' : 'bg-primary/3'
               }`}
-              onClick={() => handlePlanSelect(plan.id)}
             >
               <CardHeader>
                 <div className="flex items-center justify-between">

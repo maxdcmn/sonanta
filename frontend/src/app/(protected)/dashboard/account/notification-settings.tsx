@@ -13,9 +13,12 @@ export function NotificationSettings() {
   });
 
   return (
-    <Card>
+    <Card className="relative opacity-60">
       <CardHeader>
-        <CardTitle>Email Notifications</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          Email Notifications
+          <span className="text-secondary-foreground rounded px-2 py-1 text-xs">Soon</span>
+        </CardTitle>
         <CardDescription>Choose which types of emails you want to receive.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -28,6 +31,7 @@ export function NotificationSettings() {
             onCheckedChange={(checked) =>
               setPreferences((prev) => ({ ...prev, emailNotifications: checked }))
             }
+            disabled
           />
         </div>
 
@@ -40,6 +44,7 @@ export function NotificationSettings() {
             onCheckedChange={(checked) =>
               setPreferences((prev) => ({ ...prev, marketingEmails: checked }))
             }
+            disabled
           />
         </div>
 
@@ -52,6 +57,7 @@ export function NotificationSettings() {
             onCheckedChange={(checked) =>
               setPreferences((prev) => ({ ...prev, securityEmails: checked }))
             }
+            disabled
           />
         </div>
       </CardContent>

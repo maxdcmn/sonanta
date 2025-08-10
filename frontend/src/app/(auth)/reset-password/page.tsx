@@ -1,4 +1,4 @@
-import { ResetPasswordForm } from '@/app/(public)/reset-password/reset-password-form';
+import { ResetPasswordForm } from '@/app/(auth)/reset-password/reset-password-form';
 function ResetPasswordError() {
   return (
     <div className="flex items-center justify-center pb-20">

@@ -55,9 +55,12 @@ export function BillingHistory() {
   );
 
   return (
-    <Card>
+    <Card className="relative opacity-60">
       <CardHeader>
-        <CardTitle>Billing History</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          Billing History
+          <span className="text-secondary-foreground rounded px-2 py-1 text-xs">Soon</span>
+        </CardTitle>
         <CardDescription>View your past invoices and payments.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -92,36 +95,22 @@ export function BillingHistory() {
         </Table>
 
         <div className="mt-6">
-          <Pagination className="justify-start">
+          <Pagination className="pointer-events-none justify-start opacity-50">
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  className={
-                    currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'
-                  }
-                />
+                <PaginationPrevious className="pointer-events-none opacity-50" />
               </PaginationItem>
 
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <PaginationItem key={page}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(page)}
-                    isActive={currentPage === page}
-                    className="cursor-pointer"
-                  >
+                  <PaginationLink isActive={currentPage === page} className="pointer-events-none">
                     {page}
                   </PaginationLink>
                 </PaginationItem>
               ))}
 
               <PaginationItem>
-                <PaginationNext
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  className={
-                    currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'
-                  }
-                />
+                <PaginationNext className="pointer-events-none opacity-50" />
               </PaginationItem>
             </PaginationContent>
           </Pagination>

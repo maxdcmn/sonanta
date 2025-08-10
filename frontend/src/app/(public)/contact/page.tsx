@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function ContactPage() {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 pb-20 text-center">
+    <div className="mx-auto flex min-h-screen max-w-xs flex-col items-center justify-center gap-4 pb-20 text-center">
       <p>Interested in how this project came to be and want to keep in touch?</p>
       <p className="flex gap-4 font-mono text-sm">
         <Link
