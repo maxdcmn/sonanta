@@ -4,29 +4,33 @@ import { useEffect, useMemo, useState } from 'react';
 import { circles, type CircleConfig } from '@/components/ui/animated-circles';
 import { Progress } from '@/components/ui/progress';
 
-const VoiceReactiveSphere = ({
-  sphere,
+const VoiceReactiveCircle = ({
+  circle,
   time,
   volume,
+  isRecording,
 }: {
-  sphere: CircleConfig;
+  circle: CircleConfig;
   time: number;
   volume: number;
+  isRecording: boolean;
 }) => {
   const transform = useMemo(() => {
     const orbitMultiplier = 1 + volume * 0.1;
     const scaleMultiplier = 1 + volume * 1.1;
 
-    const x = Math.sin(time * sphere.speed) * sphere.horizontalRange * orbitMultiplier;
-    const y = Math.cos(time * sphere.speed) * sphere.verticalRange * orbitMultiplier;
-    const scale = Math.max(0.4, 1 + Math.cos(time * sphere.speed) * 0.4 * scaleMultiplier);
+    const idleOffset = isRecording ? 0 : Math.sin(time * 0.5) * 2;
+
+    const x = Math.sin(time * circle.speed) * circle.horizontalRange * orbitMultiplier + idleOffset;
+    const y = Math.cos(time * circle.speed) * circle.verticalRange * orbitMultiplier + idleOffset;
+    const scale = Math.max(0.4, 1 + Math.cos(time * circle.speed) * 0.4 * scaleMultiplier);
 
     return `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`;
-  }, [sphere, time, volume]);
+  }, [circle, time, volume, isRecording]);
 
   return (
     <div
-      className={`${sphere.className} absolute`}
+      className={`${circle.className} absolute`}
       style={{
         left: '50%',
         top: '50%',
@@ -37,19 +41,44 @@ const VoiceReactiveSphere = ({
   );
 };
 
-export default function VoiceReactiveSpheres({ size = 300 }: { size?: number }) {
+export default function VoiceReactiveCircles({
+  size = 300,
+  isRecording = false,
+  onToggleRecording,
+  isSaving = false,
+  interactive = true,
+  agentSpeaking = false,
+  isConnecting = false,
+  context = 'talk',
+}: {
+  size?: number;
+  isRecording?: boolean;
+  onToggleRecording?: () => void;
+  isSaving?: boolean;
+  interactive?: boolean;
+  agentSpeaking?: boolean;
+  isConnecting?: boolean;
+  context?: 'talk' | 'notes';
+}) {
   const [time, setTime] = useState(0);
   const [volume, setVolume] = useState(0);
   const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTime((prev) => prev + 0.008);
+      const timeIncrement = isRecording ? 0.008 : 0.003;
+      setTime((prev) => prev + timeIncrement);
     }, 8);
     return () => clearInterval(interval);
-  }, []);
+  }, [isRecording]);
 
   useEffect(() => {
+    if (!isRecording) {
+      setIsListening(false);
+      setVolume(0);
+      return;
+    }
+
     let audioContext: AudioContext | null = null;
     let stream: MediaStream | null = null;
     let rafId: number;
@@ -102,10 +131,56 @@ export default function VoiceReactiveSpheres({ size = 300 }: { size?: number }) 
       if (audioContext) audioContext.close();
       if (stream) stream.getTracks().forEach((t) => t.stop());
     };
-  }, []);
+  }, [isRecording]);
+
+  let statusText: string;
+  let dotClass: string;
+
+  if (context === 'talk') {
+    statusText = isSaving
+      ? 'Processing'
+      : isConnecting
+        ? 'Connecting…'
+        : agentSpeaking
+          ? 'Agent speaking'
+          : isRecording && isListening
+            ? 'Agent listening'
+            : 'Inactive';
+
+    dotClass = isSaving
+      ? 'bg-blue-500'
+      : isConnecting
+        ? 'bg-amber-400'
+        : agentSpeaking
+          ? 'bg-yellow-500'
+          : isRecording && isListening
+            ? 'animate-pulse bg-green-500'
+            : 'bg-gray-400';
+  } else {
+    const recording = isRecording && isListening && volume > 0;
+    statusText = isSaving
+      ? 'Saving…'
+      : isConnecting
+        ? 'Connecting…'
+        : recording
+          ? 'Recording'
+          : isRecording
+            ? 'Listening'
+            : 'Inactive';
+
+    dotClass = isSaving
+      ? 'bg-blue-500'
+      : isConnecting
+        ? 'bg-amber-400'
+        : recording
+          ? 'animate-pulse bg-green-500'
+          : isRecording
+            ? 'bg-amber-400'
+            : 'bg-gray-400';
+  }
 
   return (
-    <div className="flex flex-col items-center justify-center p-8">
+    <div className="flex flex-col items-center justify-center">
       <svg style={{ position: 'absolute', pointerEvents: 'none' }}>
         <defs>
           <filter id="voice-gooey">
@@ -116,31 +191,33 @@ export default function VoiceReactiveSpheres({ size = 300 }: { size?: number }) 
       </svg>
 
       <div
-        className="relative"
+        className={`relative ${interactive && !isSaving ? 'cursor-pointer' : ''}`}
         style={{
           filter: 'url(#voice-gooey)',
           width: `${size}px`,
           height: `${size}px`,
         }}
+        onClick={interactive && !isSaving ? onToggleRecording : undefined}
       >
-        {circles.map((sphere) => (
-          <VoiceReactiveSphere key={sphere.id} sphere={sphere} time={time} volume={volume} />
+        {circles.map((circle) => (
+          <VoiceReactiveCircle
+            key={circle.id}
+            circle={circle}
+            time={time}
+            volume={volume}
+            isRecording={isRecording}
+          />
         ))}
       </div>
-      <div className="mb-4 text-center">
-        <span
-          className={`mr-2 inline-block h-3 w-3 rounded-full ${
-            isListening ? 'animate-pulse bg-green-500' : 'bg-red-500'
-          }`}
-        />
-        <span className="text-muted-foreground text-sm">
-          {isListening ? 'Listening…' : 'Microphone not available'}
-        </span>
+
+      <div className="mb-2 text-center">
+        <span className={`mr-2 inline-block h-2 w-2 rounded-full ${dotClass}`} />
+        <span className="text-muted-foreground text-xs">{statusText}</span>
       </div>
 
-      <div className="w-50">
+      <div className="w-60">
         <Progress
-          className="[&>div]:transition-[width] [&>div]:duration-200 [&>div]:ease-out"
+          className="h-1.5 [&>div]:transition-[width] [&>div]:duration-200 [&>div]:ease-out"
           value={volume * 100}
         />
       </div>

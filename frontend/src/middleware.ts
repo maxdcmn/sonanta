@@ -54,7 +54,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const isProtected = pathname.startsWith('/dashboard');
+  const isProtected = pathname.startsWith('/dashboard') || pathname.startsWith('/voice');
   const isAuthRoute =
     pathname === '/login' ||
     pathname === '/signup' ||
