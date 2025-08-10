@@ -16,6 +16,9 @@ class Config(BaseSettings):
     elevenlabs_api_key: str
     elevenlabs_agent_id: str
     
+    # OpenAI settings
+    openai_api_key: str
+    
     # Security settings
     jwt_algorithm: str = "HS256"
     

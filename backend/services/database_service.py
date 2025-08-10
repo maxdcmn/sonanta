@@ -2,16 +2,12 @@ from typing import List, Optional, Dict, Any
 from uuid import UUID
 from datetime import datetime
 from clients.supabase import SupabaseClient
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 class DatabaseService:
     def __init__(self, supabase_client: SupabaseClient):
         self.client = supabase_client.get_client()
     
-    # Conversation methods
     async def create_conversation(
         self, 
         user_id: str,
@@ -19,7 +15,6 @@ class DatabaseService:
         title: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """Create a new conversation record."""
         data = {
             "user_id": user_id,
             "title": title,
@@ -31,7 +26,6 @@ class DatabaseService:
             response = self.client.table("conversations").insert(data).execute()
             return response.data[0] if response.data else None
         except Exception as e:
-            logger.error(f"Error creating conversation: {e}")
             raise
     
     async def get_conversation(
@@ -39,7 +33,6 @@ class DatabaseService:
         conversation_id: str, 
         user_id: str
     ) -> Optional[Dict[str, Any]]:
-        """Get a conversation by ID (with user verification)."""
         try:
             response = self.client.table("conversations") \
                 .select("*") \
@@ -50,14 +43,12 @@ class DatabaseService:
             
             return response.data
         except Exception as e:
-            logger.error(f"Error getting conversation: {e}")
             return None
     
     async def get_conversation_by_elevenlabs_id(
         self,
         elevenlabs_conversation_id: str
     ) -> Optional[Dict[str, Any]]:
-        """Get a conversation by ElevenLabs ID (for webhook processing)."""
         try:
             response = self.client.table("conversations") \
                 .select("*") \
@@ -67,7 +58,6 @@ class DatabaseService:
             
             return response.data
         except Exception as e:
-            logger.error(f"Error getting conversation by ElevenLabs ID: {e}")
             return None
     
     async def update_conversation_from_webhook(
@@ -81,7 +71,6 @@ class DatabaseService:
         context_memo_ids: Optional[List[str]] = None,
         metadata: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """Update conversation with complete data from ElevenLabs webhook."""
         data = {
             "transcript": transcript,
             "ended_at": datetime.utcnow().isoformat(),
@@ -109,7 +98,6 @@ class DatabaseService:
             
             return response.data[0] if response.data else None
         except Exception as e:
-            logger.error(f"Error updating conversation from webhook: {e}")
             raise
     
     async def get_user_conversations(
@@ -118,7 +106,6 @@ class DatabaseService:
         limit: int = 10, 
         offset: int = 0
     ) -> List[Dict[str, Any]]:
-        """Get all conversations for a user."""
         try:
             response = self.client.table("conversations") \
                 .select("*") \
@@ -130,10 +117,8 @@ class DatabaseService:
             
             return response.data
         except Exception as e:
-            logger.error(f"Error getting user conversations: {e}")
             return []
     
-    # Voice memo methods
     async def create_voice_memo(
         self,
         user_id: str,
@@ -143,7 +128,6 @@ class DatabaseService:
         title: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """Create a new voice memo record."""
         data = {
             "user_id": user_id,
             "audio_url": audio_url,
@@ -158,7 +142,6 @@ class DatabaseService:
             response = self.client.table("voice_memos").insert(data).execute()
             return response.data[0] if response.data else None
         except Exception as e:
-            logger.error(f"Error creating voice memo: {e}")
             raise
     
     async def update_voice_memo_transcript(
@@ -168,7 +151,6 @@ class DatabaseService:
         status: str = "completed",
         transcript_metadata: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """Update voice memo with transcription results."""
         data = {
             "transcript": transcript,
             "transcript_status": status,
@@ -184,7 +166,6 @@ class DatabaseService:
             
             return response.data[0] if response.data else None
         except Exception as e:
-            logger.error(f"Error updating voice memo transcript: {e}")
             raise
     
     async def update_voice_memo_tags(
@@ -193,7 +174,6 @@ class DatabaseService:
         tags: List[str],
         summary: Optional[str] = None
     ) -> Dict[str, Any]:
-        """Update voice memo with generated tags and summary."""
         data = {
             "tags": tags,
             "updated_at": datetime.utcnow().isoformat()
@@ -210,7 +190,6 @@ class DatabaseService:
             
             return response.data[0] if response.data else None
         except Exception as e:
-            logger.error(f"Error updating voice memo tags: {e}")
             raise
     
     async def get_voice_memo(
@@ -218,7 +197,6 @@ class DatabaseService:
         memo_id: str,
         user_id: str
     ) -> Optional[Dict[str, Any]]:
-        """Get a voice memo by ID (with user verification)."""
         try:
             response = self.client.table("voice_memos") \
                 .select("*") \
@@ -229,7 +207,6 @@ class DatabaseService:
             
             return response.data
         except Exception as e:
-            logger.error(f"Error getting voice memo: {e}")
             return None
     
     async def get_user_voice_memos(
@@ -239,7 +216,6 @@ class DatabaseService:
         offset: int = 0,
         tags: Optional[List[str]] = None
     ) -> List[Dict[str, Any]]:
-        """Get voice memos for a user, optionally filtered by tags."""
         try:
             query = self.client.table("voice_memos") \
                 .select("*") \
@@ -255,16 +231,13 @@ class DatabaseService:
             response = query.execute()
             return response.data
         except Exception as e:
-            logger.error(f"Error getting user voice memos: {e}")
             return []
     
-    # Conversation log methods
     async def create_conversation_log(
         self,
         user_id: str,
         duration_seconds: int
     ) -> Dict[str, Any]:
-        """Create a conversation log entry for usage tracking."""
         data = {
             "user_id": user_id,
             "duration_seconds": duration_seconds
@@ -274,5 +247,4 @@ class DatabaseService:
             response = self.client.table("conversation_logs").insert(data).execute()
             return response.data[0] if response.data else None
         except Exception as e:
-            logger.error(f"Error creating conversation log: {e}")
             raise

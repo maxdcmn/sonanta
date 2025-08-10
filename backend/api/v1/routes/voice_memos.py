@@ -1,10 +1,8 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks
 from typing import Dict, Any, List, Optional
 from dependencies import VoiceMemoServiceDep, CurrentUser
-import logging
 
 router = APIRouter(prefix="/voice-memos", tags=["voice-memos"])
-logger = logging.getLogger(__name__)
 
 
 @router.post("/upload")
@@ -15,11 +13,7 @@ async def upload_voice_memo(
     file: UploadFile = File(...),
     title: Optional[str] = Form(None)
 ) -> Dict[str, Any]:
-    """
-    Upload a voice memo file. Starts transcription and tag generation jobs.
-    """
     try:
-        # Validate file type
         allowed_types = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/m4a", "audio/webm"]
         if file.content_type not in allowed_types:
             raise HTTPException(
@@ -27,10 +21,8 @@ async def upload_voice_memo(
                 detail=f"Invalid file type. Allowed types: {', '.join(allowed_types)}"
             )
         
-        # Read file content
         content = await file.read()
         
-        # Upload voice memo
         voice_memo = await voice_memo_service.upload_voice_memo(
             user_id=str(current_user.id),
             file_content=content,
@@ -39,21 +31,16 @@ async def upload_voice_memo(
             title=title
         )
         
-        # Start background tasks for transcription and tagging
-        # TODO: Implement actual transcription and tagging once background task system is set up
         background_tasks.add_task(
             voice_memo_service.start_transcription,
             voice_memo["id"]
         )
-        
-        logger.info(f"Successfully uploaded voice memo {voice_memo['id']} for user {current_user.id}")
         
         return voice_memo
         
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error uploading voice memo: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -63,9 +50,6 @@ async def get_voice_memo(
     voice_memo_service: VoiceMemoServiceDep,
     current_user: CurrentUser
 ) -> Dict[str, Any]:
-    """
-    Get a specific voice memo by ID.
-    """
     try:
         voice_memo = await voice_memo_service.get_voice_memo(
             memo_id=memo_id,
@@ -80,7 +64,6 @@ async def get_voice_memo(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error getting voice memo: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -92,11 +75,7 @@ async def list_voice_memos(
     offset: int = 0,
     tags: Optional[str] = None  # Comma-separated tags
 ) -> Dict[str, Any]:
-    """
-    List all voice memos for the authenticated user.
-    """
     try:
-        # Parse tags if provided
         tag_list = None
         if tags:
             tag_list = [tag.strip() for tag in tags.split(",")]
@@ -115,5 +94,4 @@ async def list_voice_memos(
         }
         
     except Exception as e:
-        logger.error(f"Error listing voice memos: {e}")
         raise HTTPException(status_code=500, detail=str(e))
