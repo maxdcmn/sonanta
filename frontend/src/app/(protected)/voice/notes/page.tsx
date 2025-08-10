@@ -7,10 +7,13 @@ import type { VoiceMemo as RecorderVoiceMemo } from '@/app/(protected)/voice/not
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FadeUp } from '@/components/motion/fade-up';
 import { createClient } from '@/lib/supabase/client';
+import { useAgendaSetup } from '@/lib/hooks/use-agenda-setup';
 
 export default function VoiceNotesPage() {
   const [voiceMemos, setVoiceMemos] = useState<RecorderVoiceMemo[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useAgendaSetup();
 
   const fetchVoiceMemos = async () => {
     const supabase = createClient();
@@ -65,49 +68,51 @@ export default function VoiceNotesPage() {
   };
 
   return (
-    <div className="min-h-screen pt-50 pb-20">
-      <div className="mx-auto max-w-4xl px-6">
-        <FadeUp delay={0.1}>
-          <div className="flex flex-col items-center space-y-6">
-            <div className="mb-4 text-center">
-              <h2 className="mb-2 text-2xl font-semibold">Record Voice Notes</h2>
+    <>
+      <div className="min-h-screen pt-50 pb-20">
+        <div className="mx-auto max-w-4xl px-6">
+          <FadeUp delay={0.1}>
+            <div className="flex flex-col items-center space-y-6">
+              <div className="mb-4 text-center">
+                <h2 className="mb-2 text-2xl font-semibold">Record Voice Notes</h2>
+              </div>
+
+              <VoiceRecorder onRecordingComplete={handleRecordingComplete} />
             </div>
+          </FadeUp>
 
-            <VoiceRecorder onRecordingComplete={handleRecordingComplete} />
-          </div>
-        </FadeUp>
-
-        <FadeUp delay={0.2}>
-          <div className="space-y-4">
-            {loading ? (
-              <div className="py-8 text-center">
-                <p className="text-muted-foreground text-sm">Loading voice notes...</p>
-              </div>
-            ) : voiceMemos.length === 0 ? (
-              <div className="py-8 text-center">
-                <p className="text-muted-foreground text-sm">Your voice notes will appear here</p>
-              </div>
-            ) : (
-              <ScrollArea className="h-[700px] p-4">
-                <div className="space-y-3">
-                  {voiceMemos.map((memo) => (
-                    <VoiceNoteCard
-                      key={memo.id}
-                      id={memo.id}
-                      duration={Number(memo.duration_seconds) || 0}
-                      date={memo.created_at}
-                      transcription={memo.transcript || ''}
-                      transcript_status={memo.transcript_status || undefined}
-                      onDelete={() => handleDelete(memo.id)}
-                      onDownload={() => handleDownload(memo.id)}
-                    />
-                  ))}
+          <FadeUp delay={0.2}>
+            <div className="space-y-4">
+              {loading ? (
+                <div className="py-8 text-center">
+                  <p className="text-muted-foreground text-sm">Loading voice notes...</p>
                 </div>
-              </ScrollArea>
-            )}
-          </div>
-        </FadeUp>
+              ) : voiceMemos.length === 0 ? (
+                <div className="py-8 text-center">
+                  <p className="text-muted-foreground text-sm">Your voice notes will appear here</p>
+                </div>
+              ) : (
+                <ScrollArea className="h-[700px] p-4">
+                  <div className="space-y-3">
+                    {voiceMemos.map((memo) => (
+                      <VoiceNoteCard
+                        key={memo.id}
+                        id={memo.id}
+                        duration={Number(memo.duration_seconds) || 0}
+                        date={memo.created_at}
+                        transcription={memo.transcript || ''}
+                        transcript_status={memo.transcript_status || undefined}
+                        onDelete={() => handleDelete(memo.id)}
+                        onDownload={() => handleDownload(memo.id)}
+                      />
+                    ))}
+                  </div>
+                </ScrollArea>
+              )}
+            </div>
+          </FadeUp>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

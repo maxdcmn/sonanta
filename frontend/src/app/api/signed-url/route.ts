@@ -1,8 +1,30 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { allowRateLimit } from '@/lib/rate-limit';
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 
 export async function GET(request: Request) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const key = `signed-url:${user.id}`;
+    const result = allowRateLimit(key, 10, 60_000);
+    if (!result.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        {
+          status: 429,
+          headers: { 'Retry-After': Math.ceil((result.resetAt - Date.now()) / 1000).toString() },
+        },
+      );
+    }
+
     const agentId = process.env.ELEVENLABS_AGENT_ID;
 
     if (!agentId) {
@@ -16,7 +38,6 @@ export async function GET(request: Request) {
 
     const client = new ElevenLabsClient({ apiKey });
 
-    // Using conversations.getSignedUrl to match current SDK
     const response = await client.conversationalAi.conversations.getSignedUrl({
       agentId,
     });

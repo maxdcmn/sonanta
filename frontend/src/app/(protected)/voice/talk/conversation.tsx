@@ -3,8 +3,13 @@
 import { useConversation } from '@elevenlabs/react';
 import { useCallback, useState } from 'react';
 import VoiceReactiveCircles from '@/components/motion/voice-circles';
+import { useCurrentAgenda } from '@/lib/hooks/use-current-agenda';
+import { useAuth } from '@/lib/auth-provider';
 
 export function Conversation() {
+  const { agenda } = useCurrentAgenda();
+  const { user } = useAuth();
+
   const conversation = useConversation({
     onConnect: () => console.log('Connected'),
     onDisconnect: () => console.log('Disconnected'),
@@ -33,7 +38,15 @@ export function Conversation() {
       setIsConnecting(true);
       await navigator.mediaDevices.getUserMedia({ audio: true });
       const signedUrl = await getSignedUrl();
-      await conversation.startSession({ signedUrl });
+
+      await conversation.startSession({
+        signedUrl,
+        dynamicVariables: {
+          user_name: user?.user_metadata?.first_name || '',
+          agenda: agenda?.agenda || 'No agenda set',
+          topic: agenda?.topic || 'General discussion',
+        },
+      });
     } catch (err) {
       console.error('Failed to start conversation:', err);
       setError(err instanceof Error ? err.message : 'Failed to start conversation');

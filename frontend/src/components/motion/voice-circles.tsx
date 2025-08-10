@@ -157,26 +157,21 @@ export default function VoiceReactiveCircles({
             ? 'animate-pulse bg-green-500'
             : 'bg-gray-400';
   } else {
-    const recording = isRecording && isListening && volume > 0;
     statusText = isSaving
       ? 'Saving…'
       : isConnecting
         ? 'Connecting…'
-        : recording
-          ? 'Recording'
-          : isRecording
-            ? 'Listening'
-            : 'Inactive';
+        : isRecording
+          ? 'Listening'
+          : 'Inactive';
 
     dotClass = isSaving
       ? 'bg-blue-500'
       : isConnecting
         ? 'bg-amber-400'
-        : recording
-          ? 'animate-pulse bg-green-500'
-          : isRecording
-            ? 'bg-amber-400'
-            : 'bg-gray-400';
+        : isRecording
+          ? 'bg-amber-400'
+          : 'bg-gray-400';
   }
 
   return (
