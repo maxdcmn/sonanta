@@ -26,10 +26,11 @@ function UsageMetricCard({
   const usagePercentage = Math.min((currentValue / maxLimit) * 100, 100);
 
   return (
-    <Card>
+    <Card className="relative opacity-60">
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="flex items-center justify-between">
           {currentValue} {metricType}
+          <span className="text-secondary-foreground rounded px-2 py-1 text-xs">Soon</span>
         </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>

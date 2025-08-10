@@ -30,6 +30,7 @@ CREATE INDEX idx_conversation_messages_created_at ON public.conversation_message
 ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.conversation_messages ENABLE ROW LEVEL SECURITY;
 
+
 CREATE POLICY "Users can view own conversations" ON public.conversations
   FOR SELECT USING (auth.uid() = user_id);
 

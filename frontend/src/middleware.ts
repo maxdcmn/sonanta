@@ -54,7 +54,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const isProtected = pathname.startsWith('/dashboard');
+  const isProtected = pathname.startsWith('/dashboard') || pathname.startsWith('/voice');
   const isAuthRoute =
     pathname === '/login' ||
     pathname === '/signup' ||
@@ -69,10 +69,10 @@ export async function middleware(request: NextRequest) {
     if (pathname === '/reset-password') {
       const token = searchParams.get('token') || searchParams.get('code');
       if (!token) {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+        return NextResponse.redirect(new URL('/voice/notes', request.url));
       }
     } else {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      return NextResponse.redirect(new URL('/voice/notes', request.url));
     }
   }
 

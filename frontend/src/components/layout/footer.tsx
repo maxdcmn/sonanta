@@ -39,13 +39,13 @@ export function Footer() {
             <h3 className="text-foreground mb-3 font-medium">Company</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link className="text-muted-foreground hover:text-foreground" href="/">
-                  Landing
+                <Link className="text-muted-foreground hover:text-foreground" href="/contact">
+                  Contact Us
                 </Link>
               </li>
               <li>
-                <Link className="text-muted-foreground hover:text-foreground" href="/contact">
-                  Contact
+                <Link className="text-muted-foreground hover:text-foreground" href="/">
+                  Terms
                 </Link>
               </li>
             </ul>

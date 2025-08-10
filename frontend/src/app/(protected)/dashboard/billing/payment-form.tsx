@@ -33,9 +33,12 @@ export function PaymentForm() {
   }
 
   return (
-    <Card>
+    <Card className="relative opacity-60">
       <CardHeader>
-        <CardTitle>Payment Method</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          Payment Method
+          <span className="text-secondary-foreground rounded px-2 py-1 text-xs">Soon</span>
+        </CardTitle>
         <CardDescription>Add a new payment method to your account.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -48,7 +51,7 @@ export function PaymentForm() {
                 <FormItem>
                   <FormLabel>Cardholder Name</FormLabel>
                   <FormControl>
-                    <Input className="bg-background" placeholder="" {...field} />
+                    <Input className="bg-background" placeholder="" {...field} disabled />
                   </FormControl>
                 </FormItem>
               )}
@@ -60,7 +63,7 @@ export function PaymentForm() {
                 <FormItem>
                   <FormLabel>Card Number</FormLabel>
                   <FormControl>
-                    <Input className="bg-background" placeholder="" {...field} />
+                    <Input className="bg-background" placeholder="" {...field} disabled />
                   </FormControl>
                 </FormItem>
               )}
@@ -73,7 +76,7 @@ export function PaymentForm() {
                   <FormItem>
                     <FormLabel>Expiry Date</FormLabel>
                     <FormControl>
-                      <Input className="bg-background" placeholder="" {...field} />
+                      <Input className="bg-background" placeholder="" {...field} disabled />
                     </FormControl>
                   </FormItem>
                 )}
@@ -85,13 +88,15 @@ export function PaymentForm() {
                   <FormItem>
                     <FormLabel>CVV</FormLabel>
                     <FormControl>
-                      <Input className="bg-background" placeholder="" {...field} />
+                      <Input className="bg-background" placeholder="" {...field} disabled />
                     </FormControl>
                   </FormItem>
                 )}
               />
             </div>
-            <Button type="submit">Add Payment Method</Button>
+            <Button type="submit" disabled>
+              Add Payment Method
+            </Button>
           </form>
         </Form>
       </CardContent>

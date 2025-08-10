@@ -68,13 +68,16 @@ export function UsageChart() {
   }, [filteredData]);
 
   return (
-    <Card>
+    <Card className="relative opacity-60">
       <CardHeader className="flex justify-between">
-        <CardTitle>Analytics</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          Analytics
+          <span className="text-secondary-foreground rounded px-2 py-1 text-xs">Soon</span>
+        </CardTitle>
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline">
+            <Button variant="outline" disabled>
               {label}
               <ChevronDownIcon className="h-4 w-4" />
             </Button>

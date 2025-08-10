@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { clsx } from 'clsx';
 import { Button } from '@/components/ui/button';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/auth-provider';
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -19,6 +21,7 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { ChevronDown } from 'lucide-react';
+import { toast } from 'sonner';
 
 function ListItem({
   title,
@@ -89,13 +92,14 @@ function useNavbarVisibility({
 }
 
 export function Header() {
+  const { isLoggedIn } = useAuth();
   const { isVisible, hovering, onMouseEnter, onMouseLeave } = useNavbarVisibility({});
-  const [homeMenuOpen, setHomeMenuOpen] = useState(false);
+  const [voiceMenuOpen, setVoiceMenuOpen] = useState(false);
   const [dashboardMenuOpen, setDashboardMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      setHomeMenuOpen(false);
+      setVoiceMenuOpen(false);
       setDashboardMenuOpen(false);
     };
     window.addEventListener('resize', handleResize);
@@ -105,6 +109,12 @@ export function Header() {
       window.removeEventListener('orientationchange', handleResize);
     };
   }, []);
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.href = '/';
+  };
 
   const headerClass = clsx(
     'fixed top-0 z-50 w-full p-6 transition-transform duration-300 ease-in-out',
@@ -120,31 +130,34 @@ export function Header() {
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto max-w-6xl">
         <div className="bg-background/60 rounded-lg border-0 backdrop-blur-sm">
           <div className="flex items-center justify-between px-1 py-1">
             <div className="flex items-center">
               <NavigationMenu viewport={false} className="hidden md:block">
                 <NavigationMenuList>
                   <NavigationMenuItem>
-                    <NavigationMenuTrigger className="bg-transparent">Home</NavigationMenuTrigger>
+                    <NavigationMenuTrigger className="bg-transparent">Voice</NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <ul className="grid w-[500px] grid-cols-[.5fr_1fr] gap-x-2">
-                        <li className="row-span-3">
+                        <li className="row-span-5">
                           <NavigationMenuLink asChild>
-                            <a
+                            <Link
                               className="from-muted/50 to-muted flex h-full w-full flex-col justify-end rounded-md bg-gradient-to-b p-4 no-underline outline-hidden select-none focus:shadow-md"
-                              href="/about"
+                              href="/"
                             >
                               <div className="font-mono text-lg -tracking-wider">sonanta</div>
                               <p className="text-muted-foreground text-sm leading-tight">
-                                Dump your thoughts.
+                                Navigate thoughts
                               </p>
-                            </a>
+                            </Link>
                           </NavigationMenuLink>
                         </li>
-                        <ListItem href="/contact" title="Contact us">
-                          Have questions? We&apos;d love to hear from you.
+                        <ListItem href="/voice/notes" title="Notes">
+                          Record and review your voice messages
+                        </ListItem>
+                        <ListItem href="/voice/talk" title="Talk">
+                          Start a voice conversation
                         </ListItem>
                         <ListItem href="/how-it-works" title="How it works" disabled>
                           A quick guide to using the app.
@@ -158,8 +171,8 @@ export function Header() {
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <ul className="grid w-[300px]">
-                        <ListItem href="/dashboard" title="Overview">
-                          View your account overview and settings
+                        <ListItem href="/dashboard/account" title="Account">
+                          View your account settings
                         </ListItem>
                         <ListItem href="/dashboard/billing" title="Billing">
                           Manage your subscription and payments
@@ -174,10 +187,10 @@ export function Header() {
               </NavigationMenu>
 
               <div className="flex space-x-2 md:hidden">
-                <DropdownMenu open={homeMenuOpen} onOpenChange={setHomeMenuOpen}>
+                <DropdownMenu open={voiceMenuOpen} onOpenChange={setVoiceMenuOpen}>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                      Home
+                      Voice
                       <ChevronDown className="h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -186,7 +199,10 @@ export function Header() {
                       <Link href="/">Sonanta</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/contact">Contact us</Link>
+                      <Link href="/voice/notes">Notes</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/voice/talk">Talk</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem disabled>
                       <span className="flex w-full cursor-not-allowed items-center justify-between opacity-60">
@@ -208,7 +224,7 @@ export function Header() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-40">
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard">Overview</Link>
+                      <Link href="/dashboard/account">Account</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard/billing">Billing</Link>
@@ -222,12 +238,20 @@ export function Header() {
             </div>
 
             <div className="flex items-center space-x-2">
-              <Button variant="ghost" asChild>
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/signup">Sign Up</Link>
-              </Button>
+              {isLoggedIn ? (
+                <Button variant="ghost" onClick={handleSignOut}>
+                  Sign Out
+                </Button>
+              ) : (
+                <>
+                  <Button variant="ghost" asChild>
+                    <Link href="/login">Login</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href="/signup">Sign Up</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
